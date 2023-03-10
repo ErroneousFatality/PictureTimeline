@@ -1,7 +1,8 @@
 import { css, FASTElement, html, Observable, repeat } from "https://cdn.jsdelivr.net/npm/@microsoft/fast-element@1.11.0/dist/fast-element.min.js";
+import { configureSegments, pictures } from "./configuration.js";
 import Constraints from "./constraints.js";
-import { dividers, pictures, segments } from "./configuration.js";
 import TimelineSegment from "./Models/TimelineSegment.js";
+import TimelineSegmentContent from "./Models/TimelineSegmentContent.js";
 
 const template = html`
 <div id="container">
@@ -13,7 +14,7 @@ const template = html`
         list="markers"
     >
     <datalist id="markers">
-        ${repeat(_ => dividers, html`
+        ${repeat(timeline => timeline.Dividers, html`
             <option value="${divider => divider}"></option>
         `)}
     </datalist>
@@ -26,7 +27,7 @@ const template = html`
         >
     `)}
 
-    ${repeat(_ => pictures, html`
+    ${repeat(timeline => timeline.Pictures, html`
         <link rel="prefetch" href="${picture => picture.Source}" />
     `)}
 </div>
@@ -63,13 +64,28 @@ export class PictureTimeline extends FASTElement {
     };
 
     // Properties
-    get Segment() {
-        Observable.track(this, "Segment");
-        return this.#Segment;
-    }
 
+    /** @returns {Picture[]} */
+    get Pictures() { return this.#Pictures; }
+    /** @returns {number[]} */
+    get Dividers() { return this.#Dividers; }
+    /** @returns {TimelineSegment} */
+    get Segment() { Observable.track(this, "Segment"); return this.#Segment; }
+
+    // Fields
+
+    /** @type {Picture[]} */
+    #Pictures;
+    /** @type {number[]} */
+    #Dividers;
+    /** @type {TimelineSegment[]}*/
+    #Segments;
+    /** @type {TimelineSegment} */
+    #Segment;
+    
     constructor() {
         super();
+        this.#Initialize();
         this.#SetSegment(Constraints.Beginning);
     }
 
@@ -80,19 +96,54 @@ export class PictureTimeline extends FASTElement {
             const position = event.target.value;
             this.#SetSegment(position);
         });
-    }
-
-    // Private properties
-    /**@type {TimelineSegment} */
-    #Segment;
+    }   
 
     // Private methods
+    #Initialize() {
+        this.#Pictures = pictures;
+        
+        /** @type {Map<string, Picture>}*/
+        const pictureMap = new Map();
+        for (const picture of pictures) {
+            pictureMap.set(picture.Name, picture);
+        }
+        const segmentConfiguration = configureSegments(pictureMap);
+
+        const dividers = Object.keys(segmentConfiguration)
+            .map(key => {
+                const divider = parseInt(key);
+                if (divider < Constraints.Beginning || divider >= Constraints.End) {
+                    throw new Error(`Segment divider must be inside range [${Constraints.Beginning}, ${Constraints.End}).`);
+                }
+                return divider;
+            })
+            .sort((a, b) => a - b);
+        this.#Dividers = dividers;
+
+        const bounds = this.#Dividers.slice();
+        if (bounds.length === 0 || bounds[0] !== Constraints.Beginning) {
+            bounds.unshift(Constraints.Beginning);
+            segmentConfiguration[Constraints.Beginning] = new TimelineSegmentContent([]);
+        }
+        bounds.push(Constraints.End);
+
+        /**@type {TimelineSegment[]} */
+        const segments = [];
+        for (let i = 1; i < bounds.length; i++) {
+            const beginning = bounds[i - 1];
+            const end = bounds[i];
+            const segmentContent = segmentConfiguration[beginning];
+            const segment = new TimelineSegment(beginning, end, segmentContent.PicturePlacements, segmentContent.Description);
+            segments.push(segment);
+        }
+        this.#Segments = segments;
+    }
 
     /** @param {number} position */
     #SetSegment(position) {
         this.#Segment = position == Constraints.End
-            ? segments[segments.length - 1]
-            : segments.find(segment => segment.Beginning <= position && position < segment.End);
+            ? this.#Segments[segments.length - 1]
+            : this.#Segments.find(segment => segment.Beginning <= position && position < segment.End);
         Observable.notify(this, "Segment");
     }
 }

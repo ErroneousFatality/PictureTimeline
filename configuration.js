@@ -1,12 +1,7 @@
-import Constraints from "./constraints.js";
 import Picture from "./Models/Picture.js";
 import PicturePlacement from "./Models/PicturePlacement.js";
-import TimelineSegment from "./Models/TimelineSegment.js";
 import TimelineSegmentContent from "./Models/TimelineSegmentContent.js";
 
-/**
- * pictures - lista svih fotografije koje planiras da koristis.
- */
 /** @type {Picture[]}*/
 export const pictures = [
     new Picture("Sekiro", "https://i.pinimg.com/236x/4e/03/c6/4e03c646553426caa92d3d7dc996282b.jpg", "Opcioni opis fotografije"),
@@ -18,92 +13,59 @@ export const pictures = [
 ];
 
 /**
- * pictureMap - koristi da lako referenciras postojecu istu fotografiju preko njenog imena unutar segmentConfiguration-a, da ne bi vise puta definisali istu fotografiju.
+ * 
+ * @param {Map<string, Picture>} pictureMap
+ * @returns {Object.<number, TimelineSegmentContent>}
  */
-/** @type {Map<string, Picture>}*/
-const pictureMap = new Map();
-for (const picture of pictures) {
-    pictureMap.set(picture.Name, picture);
+export function configureSegments(pictureMap) {
+    return {
+        10: new TimelineSegmentContent(
+            [
+                new PicturePlacement(pictureMap.get("Sekiro"), 20, 8)
+            ],
+            "Opcioni opis segmenta"
+        ),
+        20: new TimelineSegmentContent(
+            [
+                new PicturePlacement(pictureMap.get("Zaraki"), 60, 0)
+            ]
+        ),
+        30: new TimelineSegmentContent(
+            [
+                new PicturePlacement(pictureMap.get("Zaraki"), 55, 1),
+                new PicturePlacement(pictureMap.get("Mr. Robot"), 40, 5)
+            ]
+        ),
+        40: new TimelineSegmentContent(
+            [
+                new PicturePlacement(pictureMap.get("Zaraki"), 65, 10),
+                new PicturePlacement(pictureMap.get("Mr. Robot"), 40, 30),
+                new PicturePlacement(pictureMap.get("Mob"), 5, 20)
+            ],
+            "Cela banda na okupu"
+        ),
+        60: new TimelineSegmentContent(
+            [
+                new PicturePlacement(pictureMap.get("Zaraki"), 45, 15),
+                new PicturePlacement(pictureMap.get("Mob"), 5, 20)
+            ]
+        ),
+        80: new TimelineSegmentContent(
+            [
+                new PicturePlacement(pictureMap.get("Zaraki"), 40, 20)
+            ]
+        ),
+        90: new TimelineSegmentContent([]),
+        99: new TimelineSegmentContent(
+            [
+                new PicturePlacement(pictureMap.get("Alphonse"), 0, 0),
+                new PicturePlacement(pictureMap.get("Edward"), 28, 10),
+                new PicturePlacement(pictureMap.get("Alphonse"), 45, 0),
+                new PicturePlacement(pictureMap.get("Edward"), 5, 85),
+                new PicturePlacement(pictureMap.get("Alphonse"), 35, 85),
+                new PicturePlacement(pictureMap.get("Edward"), 65, 85),
+            ],
+            "AL!"
+        )
+    };
 }
-
-/**
- * segmentConfiguration - Ovde listas sve segmente tako sto levo stavis od koje tacke [0..100) krece i od kojih fotografija na kojim pozicijama se sastoji.
- */
-const segmentConfiguration = {
-    10: new TimelineSegmentContent(
-        [
-            new PicturePlacement(pictureMap.get("Sekiro"), 20, 8)
-        ],
-        "Opcioni opis segmenta"
-    ),
-    20: new TimelineSegmentContent(
-        [
-            new PicturePlacement(pictureMap.get("Zaraki"), 60, 0)
-        ]
-    ),
-    30: new TimelineSegmentContent(
-        [
-            new PicturePlacement(pictureMap.get("Zaraki"), 55, 1),
-            new PicturePlacement(pictureMap.get("Mr. Robot"), 40, 5)
-        ]
-    ),
-    40: new TimelineSegmentContent(
-        [
-            new PicturePlacement(pictureMap.get("Zaraki"), 65, 10),
-            new PicturePlacement(pictureMap.get("Mr. Robot"), 40, 30),
-            new PicturePlacement(pictureMap.get("Mob"), 5, 20)
-        ],
-        "Cela banda na okupu"
-    ),
-    60: new TimelineSegmentContent(
-        [
-            new PicturePlacement(pictureMap.get("Zaraki"), 45, 15),
-            new PicturePlacement(pictureMap.get("Mob"), 5, 20)
-        ]
-    ),
-    80: new TimelineSegmentContent(
-        [
-            new PicturePlacement(pictureMap.get("Zaraki"), 40, 20)
-        ]
-    ),
-    90: new TimelineSegmentContent([]),
-    99: new TimelineSegmentContent([
-        new PicturePlacement(pictureMap.get("Alphonse"), 0, 0),
-        new PicturePlacement(pictureMap.get("Edward"), 28, 10),
-        new PicturePlacement(pictureMap.get("Alphonse"), 45, 0),
-        new PicturePlacement(pictureMap.get("Edward"), 5, 85),
-        new PicturePlacement(pictureMap.get("Alphonse"), 35, 85),
-        new PicturePlacement(pictureMap.get("Edward"), 65, 85),
-    ], "AL!")
-}
-
-
-
-/** @type {number[]}*/
-export const dividers = Object.keys(segmentConfiguration)
-    .map(key => {
-        const divider = parseInt(key);
-        if (divider < Constraints.Beginning || divider >= Constraints.End) {
-            throw new Error(`Segment divider must be inside range [${Constraints.Beginning}, ${Constraints.End}).`);
-        }
-        return divider;
-    })
-    .sort((a, b) => a - b);
-
-const bounds = dividers.slice();
-if (bounds.length === 0 || bounds[0] !== Constraints.Beginning) {
-    bounds.unshift(Constraints.Beginning);
-    segmentConfiguration[Constraints.Beginning] = new TimelineSegmentContent([]);
-}
-bounds.push(Constraints.End);
-
-/**@type {TimelineSegment[]} */
-const _segments = [];
-for (let i = 1; i < bounds.length; i++) {
-    const beginning = bounds[i - 1];
-    const end = bounds[i];
-    const segmentContent = segmentConfiguration[beginning];
-    const segment = new TimelineSegment(beginning, end, segmentContent.PicturePlacements, segmentContent.Description);
-    _segments.push(segment);
-}
-export const segments = _segments;
