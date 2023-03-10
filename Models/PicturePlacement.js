@@ -7,23 +7,35 @@ export default class PicturePlacement {
 
     /** 
      * @param {Picture} picture
-     * @param {number} x
-     * @param {number} y
+     * @param {number} x percentage
+     * @param {number} y percentage
+     * @param {number} width percentage
      */
-    constructor(picture, x, y) {
+    constructor(picture, x, y, width) {
         if (picture == null) {
             throw new Error("Picture is missing.");
         }
         this.Picture = picture;
 
-        if (x == null || !Number.isInteger(x) || x < 0) {
-            throw new Error("X must be a natural number.");
-        }
+        this.#ValidatePercentage(x, "X");
         this.X = x;
 
-        if (y == null || !Number.isInteger(y) || y < 0) {
-            throw new Error("Y must be a natural number.");
-        }
+        this.#ValidatePercentage(y, "Y");
         this.Y = y;
+
+        this.#ValidatePercentage(width, "Width");
+        this.Width = width;
+    }
+
+    // Private methods
+    /**
+     * 
+     * @param {number} percentage
+     * @param {string} parameterName
+     */
+    #ValidatePercentage(percentage, parameterName) {
+        if (percentage == null || !Number.isFinite(percentage) || 0 > percentage || percentage > 100) {
+            throw new Error(`PicturePlacement for ${this.Picture.Name} has an invalid percentage value for ${parameterName}.`);
+        }
     }
 }

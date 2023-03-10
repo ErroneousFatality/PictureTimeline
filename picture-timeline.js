@@ -23,7 +23,7 @@ const template = html`
         <img class="picture"
             src="${picturePlacement => picturePlacement.Picture.Source}" 
             alt="${picturePlacement => picturePlacement.Picture.Name}"
-            style="left: ${picturePlacement => picturePlacement.X}%; top: ${picturePlacement => picturePlacement.Y}%;"
+            style="left: ${picturePlacement => picturePlacement.X}%; top: ${picturePlacement => picturePlacement.Y}%; width: ${picturePlacement => picturePlacement.Width}%;"
         >
     `)}
 
