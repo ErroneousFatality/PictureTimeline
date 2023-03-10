@@ -32,48 +32,48 @@ for (const picture of pictures) {
 const segmentConfiguration = {
     10: new TimelineSegmentContent(
         [
-            new PicturePlacement(pictureMap.get("Sekiro"), 500, 100)
+            new PicturePlacement(pictureMap.get("Sekiro"), 20, 8)
         ],
         "Opcioni opis segmenta"
     ),
     20: new TimelineSegmentContent(
         [
-            new PicturePlacement(pictureMap.get("Zaraki"), 1300, 0)
+            new PicturePlacement(pictureMap.get("Zaraki"), 60, 0)
         ]
     ),
     30: new TimelineSegmentContent(
         [
-            new PicturePlacement(pictureMap.get("Zaraki"), 1200, 50),
-            new PicturePlacement(pictureMap.get("Mr. Robot"), 900, 300)
+            new PicturePlacement(pictureMap.get("Zaraki"), 55, 1),
+            new PicturePlacement(pictureMap.get("Mr. Robot"), 40, 5)
         ]
     ),
     40: new TimelineSegmentContent(
         [
-            new PicturePlacement(pictureMap.get("Zaraki"), 1100, 100),
-            new PicturePlacement(pictureMap.get("Mr. Robot"), 900, 300),
-            new PicturePlacement(pictureMap.get("Mob"), 100, 200)
+            new PicturePlacement(pictureMap.get("Zaraki"), 65, 10),
+            new PicturePlacement(pictureMap.get("Mr. Robot"), 40, 30),
+            new PicturePlacement(pictureMap.get("Mob"), 5, 20)
         ],
         "Cela banda na okupu"
     ),
     60: new TimelineSegmentContent(
         [
-            new PicturePlacement(pictureMap.get("Zaraki"), 1000, 150),
-            new PicturePlacement(pictureMap.get("Mob"), 100, 200)
+            new PicturePlacement(pictureMap.get("Zaraki"), 45, 15),
+            new PicturePlacement(pictureMap.get("Mob"), 5, 20)
         ]
     ),
     80: new TimelineSegmentContent(
         [
-            new PicturePlacement(pictureMap.get("Zaraki"), 900, 200)
+            new PicturePlacement(pictureMap.get("Zaraki"), 40, 20)
         ]
     ),
     90: new TimelineSegmentContent([]),
     99: new TimelineSegmentContent([
         new PicturePlacement(pictureMap.get("Alphonse"), 0, 0),
-        new PicturePlacement(pictureMap.get("Edward"), 600, 100),
-        new PicturePlacement(pictureMap.get("Alphonse"), 1150, 0),
-        new PicturePlacement(pictureMap.get("Edward"), 100, 850),
-        new PicturePlacement(pictureMap.get("Alphonse"), 700, 850),
-        new PicturePlacement(pictureMap.get("Edward"), 1300, 850),
+        new PicturePlacement(pictureMap.get("Edward"), 28, 10),
+        new PicturePlacement(pictureMap.get("Alphonse"), 45, 0),
+        new PicturePlacement(pictureMap.get("Edward"), 5, 85),
+        new PicturePlacement(pictureMap.get("Alphonse"), 35, 85),
+        new PicturePlacement(pictureMap.get("Edward"), 65, 85),
     ], "AL!")
 }
 
